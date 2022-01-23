@@ -1,7 +1,10 @@
+from http.client import _DataType
 import requests
 import json
 import pprint
 from datetime import datetime
+import base58
+import random
 
 # https://github.com/iexbase/tron-api-python
 # from tronapi import *
@@ -9,130 +12,169 @@ from datetime import datetime
 # https://tronpy.readthedocs.io/en/latest/quickstart.html
 from tronpy import Tron
 
-client = Tron()
+CONF_MAINNET = {
+    "fullnode": "https://api.trongrid.io",
+    "event": "https://api.trongrid.io",
+}
 
-ressource = client.get_account_resource("THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM")
+# The long running, maintained by the tron-us community
+CONF_SHASTA = {
+    "fullnode": "https://api.shasta.trongrid.io",
+    "event": "https://api.shasta.trongrid.io",
+    "faucet": "https://www.trongrid.io/faucet",
+}
 
-pprint.pprint(ressource)
+# Maintained by the official team
+CONF_NILE = {
+    "fullnode": "https://api.nileex.io",
+    "event": "https://event.nileex.io",
+    "faucet": "http://nileex.io/join/getJoinPage",
+}
 
-# Lien : https://developers.tron.network/reference/testinput
+# Maintained by the official team
+CONF_TRONEX = {
+    "fullnode": "https://testhttpapi.tronex.io",
+    "event": "https://testapi.tronex.io",
+    "faucet": "http://testnet.tronex.io/join/getJoinPage",
+}
 
-# 255 362 841
-# 230 464 897
+ALL = {
+    "mainnet": CONF_MAINNET,
+    "nile": CONF_NILE,
+    "shasta": CONF_SHASTA,
+    "tronex": CONF_TRONEX,
+}
 
-# full_node = 'https://api.trongrid.io'
-# solidity_node = 'https://api.trongrid.io'
-# event_server = 'https://api.trongrid.io'
+DEFAULT_CONF = {
+    'fee_limit': 10_000_000,
+    'timeout': 10.0,  # in second
+}
 
-# tron = Tron(full_node=full_node,
-#         solidity_node=solidity_node,
-#         event_server=event_server)
+def conf_for_name(name: str) -> dict:
+    return ALL.get(name, None)
 
-# tron.default_block = 'latest'
+DEFAULT_API_KEYS = [
+    'f92221d5-7056-4366-b96f-65d3662ec2d9',
+    '1e0a625f-cfa5-43ee-ba41-a09db1aae55f',
+    'f399168e-2259-481c-90fc-6b3d984c5463',
+    'da63253b-aa9c-46e7-a4e8-22d259a8026d',
+    '88c10958-af7b-4d5a-8eef-6e84bf5fb809',
+    '169bb4b3-cbe8-449a-984e-80e9adacac55',
+]
 
+# Choisir une clé de facon aléatoire
+def random_api_key(parametre):
+    return random.choice(parametre)
 
-# tron.getAccountResources("THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM")
+# Renvoie un tuple contenant la difference de temps en
+# datetime ainsi que chaine de caractere recap
+def diff_date(date_debut : datetime, date_fin : datetime) -> tuple[datetime, str]:
+    difference = date_fin-date_debut
 
-# print("result : ", tron.toHex(text="THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM"))
+    en_minutes = round(difference.total_seconds() / 60, 2)
+    en_heures = round(en_minutes / 60, 2)
+    en_jours = round(en_heures / 24, 2)
 
+    string_result = "{} jours => {} heures => {} minutes".format(en_jours,en_heures,en_minutes)
 
+    return difference,string_result
 
-# print("infos : ", tron.get_block('latest'))
+# MAIN
+if __name__ == '__main__':
 
-# ma_cle_trongrid = "0c3185b7-6507-4405-9d01-620c5b276b8c"
-# network = "https://api.trongrid.io"
+    date_1 = datetime.now()
 
-# url = "https://api.trongrid.io/wallet/getaccountresource"
+    date_bebe_1 = datetime(2022, 1, 24, 13, 18, 3)
+    date_bebe_2 = datetime(2022, 1, 24, 17, 28, 39)
+    date_bebe_3 = datetime(2022, 1, 24, 23, 55, 30)
 
-# payload = {
-#     "address": "41BF97A54F4B829C4E9253B26024B1829E1A3B1120",
-#     "visible": False
-# }
-# headers = {
-#     "Accept": "application/json",
-#     "Content-Type": "application/json"
-# }
+    difference = date_bebe_1-date_1
 
-# response = requests.request("POST", url, json=payload, headers=headers)
+    en_minutes = round(difference.total_seconds() / 60, 2)
+    en_heures = round(en_minutes / 60, 2)
+    en_jours = round(en_heures / 24, 2)
 
-# print(response.text)
-# response_dict = json.loads(response.text)
-# print("======\n")
-# pprint.pprint(response_dict)
+    string_result = "{} jours => {} heures => {} minutes".format(en_jours,en_heures,en_minutes)
 
-# bandwith : freeNetLimit
+    print("date 1 : ",date_1)
+    print("date 2 : ",date_bebe_1)
 
+    print("diff : ", difference)
+    print("en_minutes : ", en_minutes)
+    print("en_heures : ", en_heures)
+    print("en_jours : ", en_jours)
 
-# url = "https://api.trongrid.io/v1/accounts/THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM"
+    print("resul ", string_result)
+    
 
-# headers = {"Accept": "application/json"}
+    exit(1)
+    
+    # Partie réseau - requete API
+    client = Tron()
 
-# response = requests.request("GET", url, headers=headers)
+    ressource = client.get_account_resource("THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM")
 
-# Permet de charger la string direct en dictionnaire
-# response_dict = json.loads(response.text)
+    pprint.pprint(ressource)
 
-# pprint.pprint(response_dict)
+    adresse_cukies = "THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM"
+    adresse_tronlink = "TVLkepuiaDYesEHDVELBHTTCqnWFiVXsN3"
+    adresse_vote = "https://tronscan.io/#/sr/votes?from=tronlink"
 
-# INFOS =================
-# energy usage :
-"""
-Avant : 
+    client = Tron()
 
-web : 25 738 909
-api : 229 622 285
+    adresse_cukies_base58 = base58.b58decode_check(adresse_cukies).hex()
+    adresse_tronlink_base58 = base58.b58decode_check(adresse_tronlink).hex()
 
-Après : 
+    print("adresse_cukies_base58 ! ", adresse_cukies_base58)
+    print("adresse_tronlink_base58 : ", adresse_tronlink_base58)
 
-web : 25,858,635
-api : 229 502 490
+    # ZONE DE TEST
+    # print("Debut")
 
-"""
-# acquired from frozen energy : 8 250 000 000 000
+    mes_cles_api = DEFAULT_API_KEYS.copy()
 
-# timestamp = 1642241049
-# dt_object = datetime.fromtimestamp(timestamp)
+    mon_provider = requests.session()
+    mon_provider.headers["User-Agent"] = "Tronpy/0.2"
+    mon_provider.headers["Tron-Pro-Api-Key"] = random_api_key(mes_cles_api)
 
-# print("last consume of energy : ", dt_object)
+    url = "https://api.trongrid.io/wallet/triggersmartcontract "
+    params = {'contract_address': adresse_cukies_base58,
+                'function_selector': "name()",
+                'owner_address' : adresse_tronlink_base58
+                }
+    resp = mon_provider.post(url, json=params, timeout=10)
+    # print("resp ", resp)
+    print("header : ", resp.headers)
 
-if (False):
-    url = "https://api.trongrid.io/wallet/getaccountresource"
+    """
 
-    payload = {"address": "54484553624173727358384a665269596d3750314b757063733169374a614231634d"}
+    adresse_cukies_base58 !  414faa7674e50271a075a07097112d993662f634d3
+    adresse_tronlink_base58 :  41d47d8bd0d26d2f0710581103c01cda66e6c1730c
 
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
+    curl.exe -X POST https://api.trongrid.io/wallet/triggersmartcontract -d '{
+            "contract_address":"THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM",
+            "function_selector":"name()",
+            "owner_address":"TVLkepuiaDYesEHDVELBHTTCqnWFiVXsN3"
+    }'
 
-    response = requests.request("POST", url, json=payload, headers=headers)
+    curl.exe -X POST https://api.trongrid.io/wallet/triggersmartcontract -d '{
+            "contract_address":"414faa7674e50271a075a07097112d993662f634d3",
+            "function_selector":"name()",
+            "owner_address":"41d47d8bd0d26d2f0710581103c01cda66e6c1730c"
+    }'
 
-    print("ok : ", response.ok)
-    print(response.text)
+        """
 
-# Exemple pour Get transaction info by contract address 
-if (False):
-    url = "https://api.shasta.trongrid.io/v1/contracts/THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM/transactions"
+    # resp = resp.json()
+    # pprint.pprint(resp)
 
-    headers = {"Accept": "application/json"}
+    # GET ACCOUNT
+    # url = "https://api.trongrid.io/wallet/getaccount"
+    # params = {'address': 'TVLkepuiaDYesEHDVELBHTTCqnWFiVXsN3', 'visible': True}
+    # resp = mon_provider.post(url, json=params, timeout=10)
+    # resp = resp.json()
+    # pprint.pprint(resp)
 
-    response = requests.request("GET", url, headers=headers)
-
-    print(response.text)
-
-# Exemple pour créer une transaction
-if (False):
-    url = "https://api.trongrid.io/wallet/createtransaction"
-
-    payload = "{\n    \"to_address\": \"41e9d79cc47518930bc322d9bf7cddd260a0260a8d\",   \
-                \n    \"owner_address\": \"41D1E7A6BC354106CB410E65FF8B181C600FF14292\" \
-                ,\n    \"amount\": 1000\n}"
-
-    headers = {
-        'Content-Type': "application/json",
-        'TRON-PRO-API-KEY': "0c3185b7-6507-4405-9d01-620c5b276b8c"
-        }
-
-    response = requests.request("POST", url, data=payload, headers=headers)
-
-    print(response.text)
+    # print("adresse normale : ", adresse_tronlink)
+    # print("adresse base58 : ", adresse_tronlink_base58)
+    # print("adresse hex : ", adresse_tronlink_base58.hex())

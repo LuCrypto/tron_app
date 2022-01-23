@@ -6,13 +6,15 @@ from datetime import datetime
 
 client = Tron()
 adresse_cukies = "THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM"
-adresse_tronlink = "TVLkepuiaDYesEHDVELBHTTCqnWFiVXsN3"
+mon_adresse_tronlink = "TVLkepuiaDYesEHDVELBHTTCqnWFiVXsN3"
+adresse_vote = "https://tronscan.io/#/sr/votes?from=tronlink"
+adresse_tronlink_victor = "TQ3ATvXV91QUWk4zimTNQxQkgKmSv3AUT7"
 
 def myTron():
     return client
 
 def myAdress() -> tuple[str, str]:
-    return (adresse_tronlink, adresse_cukies)
+    return (mon_adresse_tronlink, adresse_tronlink_victor, adresse_cukies)
 
 """
 Simply save it with a .pyw extension. This will prevent the console window from opening.
@@ -26,8 +28,8 @@ in that case, the console window that normally appears is suppressed.
 # Renvoie l'energie du compte
 def getEnergy(ressource : dict) -> tuple[str, float, float, float]:
 
-    print("=======\n")
-    pprint.pprint(ressource)
+    # print("=======\n")
+    # pprint.pprint(ressource)
 
     try:
         energy_used = ressource['EnergyUsed']
@@ -112,7 +114,7 @@ def getTronpower(ressource : dict) -> tuple[str,int,int]:
     return (f"{tron_power_used}/{tronPowerLimit} Tronpower\n\nNon utilisé : {tronPowerLimit-tron_power_used}",tron_power_used, tronPowerLimit)
 
 # Requete pour donner tronlink
-def actualiser_donnees_tronlink():
+def actualiser_donnees_tronlink(adresse_tronlink):
     global client
     # ============== TRONLINK
     ressource = client.get_account_resource(adresse_tronlink)

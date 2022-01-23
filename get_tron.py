@@ -1,43 +1,41 @@
+import webbrowser
 import pprint
+from datetime import datetime
 from tronpy import Tron
 import PySimpleGUI as sg
 import time
-from datetime import datetime
+import base58
+import requests
+import random
+from playsound import playsound
+
+# Mes fichiers
 from api import *
 from gui import principal
+
+# Adresse vers les sites importants
+adresse_vote = "https://tronscan.io/#/sr/votes?from=tronlink"
+adresse_site_official = "https://www.cukies.world/"
+adresse_dapp = "https://marketplace.cukies.world/dashboard"
+adresse_token_goodies = "https://www.tokengoodies.com/"
+adresse_whitepaper = "https://whitepaper.cukies.world/introduction/start-here"
+adresse_contract_cukies = "https://tronscan.org/#/address/THESbAsrsX8JfRiYm7P1Kupcs1i7JaB1cM"
+adresse_contract_stack_trx = "https://tronscan.io/#/wallet/resources?from=tronlink"
 
 # MAIN
 if __name__ == '__main__':
     # INITIALISATION
     client = myTron()
-    adresse_tronlink, adresse_cukies = myAdress()
+    mon_adresse_tronlink, adresse_tronlink_victor, adresse_cukies = myAdress()
 
-    # ZONE DE TEST
-    print("Debut")
-    
-    # ressource = client.get_account_asset_balance()
-    # ressource = client.get_account(adresse_tronlink)
-    # pprint.pprint(ressource)
-
-    # print("=====")
-    # print("=====")
-    # print("=====")
-
-    # infos = ressource.get('account_resource', 0).get('frozen_balance_for_energy', 0)
-    # print("infos : ", infos.get('frozen_balance',0))
-    # temps = infos.get('expire_time',0)
-    # print("infos temps : ", temps)
-    # print("infos temps : ", type(temps))
-    # # temps = datetime.timestamp(temps)
-    # # print("infos temps : ", temps)
-    # print("infos temps converti : ", datetime.fromtimestamp(1642338888))
-
-    # exit(1)
-
-    energy_infos_tronlink,bandwitdh_infos_tronlink,tronpower_infos_tronlink,trx_unstake = actualiser_donnees_tronlink()
+    energy_infos_mon_tronlink,bandwitdh_infos_mon_tronlink,tronpower_infos_mon_tronlink,trx_unstake_mon_tronlink = actualiser_donnees_tronlink(mon_adresse_tronlink)
+    energy_infos_tronlink_victor,bandwitdh_infos_tronlink_victor,tronpower_infos_tronlink_victor,trx_unstake_victor = actualiser_donnees_tronlink(adresse_tronlink_victor)
     energy_infos_cukies = actualiser_donnees_cukies()
 
-    layout = principal(energy_infos_tronlink,bandwitdh_infos_tronlink,tronpower_infos_tronlink,trx_unstake,energy_infos_cukies)
+    layout = principal(energy_infos_mon_tronlink,bandwitdh_infos_mon_tronlink,tronpower_infos_mon_tronlink,trx_unstake_mon_tronlink,
+                        energy_infos_cukies,
+                        energy_infos_tronlink_victor,bandwitdh_infos_tronlink_victor,tronpower_infos_tronlink_victor,trx_unstake_victor
+                        )
 
     # Create the Window
     window = sg.Window('LuCrypto - Mon application TRON', layout, margins=(10,10), resizable=True, finalize=True)
@@ -47,12 +45,44 @@ if __name__ == '__main__':
     current_time = 0
     compteur = 0
     start_time = int(round(time.time() * 100))
+    envoyer_son = False
 
     secondes = 1
     who_refresh = 0
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
-        event, values = window.read(timeout=1000)
+        event, values = window.read(timeout=1000*secondes)
+        if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
+            break
+
+        # EVENEMENT BOUTON
+        # =================================================================
+        if (event == "--RAFRAICHIR--"):
+            print("RAFRAICHIR MANUAL")
+            # Mettre une protection pour ne pas spammer et freeze l'application
+        elif (event == "--VOTE--"):
+            webbrowser.open(adresse_vote)
+            continue
+        elif (event == "--TOKEN_GOODIES--"):
+            webbrowser.open(adresse_token_goodies)
+            continue
+        elif (event == "--SITE_OFFICIAL--"):
+            webbrowser.open(adresse_site_official)
+            continue
+        elif (event == "--DAPP--"):
+            webbrowser.open(adresse_dapp)
+            continue
+        elif (event == "--WHITEPAPER--"):
+            webbrowser.open(adresse_whitepaper)
+            continue
+        elif (event == "--CONTRACT_ENERGY--"):
+            webbrowser.open(adresse_contract_cukies)
+            continue
+        elif (event == "--STACK_TRX--"):
+            webbrowser.open(adresse_contract_stack_trx)
+            continue
+        print('You entered ', event)
+        # =================================================================
 
         compteur += 1
 
@@ -76,44 +106,51 @@ if __name__ == '__main__':
                 energy_infos_cukies = actualiser_donnees_cukies()
             # TRONLINK
             elif (who_refresh == 1):
-                energy_infos_tronlink,bandwitdh_infos_tronlink,tronpower_infos_tronlink,trx_unstake = actualiser_donnees_tronlink()
+                energy_infos_mon_tronlink,bandwitdh_infos_mon_tronlink,tronpower_infos_mon_tronlink,trx_unstake_mon_tronlink = actualiser_donnees_tronlink(mon_adresse_tronlink)
 
             # TEXTES
             # =================================================================
+            # CUKIES
             window['text_cukies_energy'].update(energy_infos_cukies[0])
-            window['text_tronlink_energy'].update(energy_infos_tronlink[0])
-            window['text_tronlink_bandwidth'].update(bandwitdh_infos_tronlink[0])
-            window['text_tronlink_tronpower'].update(tronpower_infos_tronlink[0])
-            window['text_tronlink_trx'].update(trx_unstake)
+            # MON TRONLINK
+            window['text_tronlink_energy'].update(energy_infos_mon_tronlink[0])
+            window['text_tronlink_bandwidth'].update(bandwitdh_infos_mon_tronlink[0])
+            window['text_tronlink_tronpower'].update(tronpower_infos_mon_tronlink[0])
+            window['text_tronlink_trx'].update(trx_unstake_mon_tronlink)
+            # VICTOR TRONLINK
+            window['text_tronlink_energy_victor'].update(energy_infos_tronlink_victor[0])
+            window['text_tronlink_bandwidth_victor'].update(bandwitdh_infos_tronlink_victor[0])
+            window['text_tronlink_tronpower_victor'].update(tronpower_infos_tronlink_victor[0])
+            window['text_tronlink_trx_victor'].update(trx_unstake_victor)
 
             # COULEURS
             # =================================================================
             # TRONLINK energie
-            if (energy_infos_tronlink[1] > 200_000):
+            if (energy_infos_mon_tronlink[1] > 200_000):
                 window['text_tronlink_energy'].update(background_color="green")
-            elif (energy_infos_tronlink[1] > 100_000):
+            elif (energy_infos_mon_tronlink[1] > 100_000):
                 window['text_tronlink_energy'].update(background_color="orange")
             else:
                 window['text_tronlink_energy'].update(background_color="red")
             
             # TRONLINK TRX unstake
-            if (trx_unstake > 200):
+            if (trx_unstake_mon_tronlink > 200):
                 window['text_tronlink_trx'].update(background_color="green")
-            elif (trx_unstake > 100):
+            elif (trx_unstake_mon_tronlink > 100):
                 window['text_tronlink_trx'].update(background_color="orange")
             else:
                 window['text_tronlink_trx'].update(background_color="red")
             
             # TRONLINK bandwidth
-            if (bandwitdh_infos_tronlink[1] > 1000):
+            if (bandwitdh_infos_mon_tronlink[1] > 1000):
                 window['text_tronlink_bandwidth'].update(background_color="green")
-            elif (bandwitdh_infos_tronlink[1] > 500):
+            elif (bandwitdh_infos_mon_tronlink[1] > 500):
                 window['text_tronlink_bandwidth'].update(background_color="orange")
             else:
                 window['text_tronlink_bandwidth'].update(background_color="red")
 
             # TRONLINK TRON power
-            if (tronpower_infos_tronlink[2]-tronpower_infos_tronlink[1] > 0):
+            if (tronpower_infos_mon_tronlink[2]-tronpower_infos_mon_tronlink[1] > 0):
                 window['text_tronlink_tronpower'].update(background_color="red")
             else:
                 window['text_tronlink_tronpower'].update(background_color="green")
@@ -125,13 +162,13 @@ if __name__ == '__main__':
                 window['text_cukies_energy'].update(background_color="orange")
             elif (energy_infos_cukies[1] > 1_000_000):
                 window['text_cukies_energy'].update(background_color="orange red")
+                if (not(envoyer_son)):
+                    playsound("imperial-alertdeath-star-alarmclean.mp3")
+                    envoyer_son = True
             else:
                 window['text_cukies_energy'].update(background_color="red")
 
 
-        if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
-            break
-        print('You entered ', event)
 
     # FIN BOUCLE PRINCIPALE
     window.close()
