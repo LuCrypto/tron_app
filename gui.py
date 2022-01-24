@@ -185,6 +185,10 @@ def principal(energy_infos_mon_tronlink,bandwitdh_infos_mon_tronlink,tronpower_i
     for i in bas:
         layout.append(i)
 
+    # mon_image = [sg.Image("images/breaading_cukies.png")]
+
+    # layout.append(mon_image)
+
     # Layout global
     # layout = [  haut,
     #             cukies,

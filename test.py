@@ -1,4 +1,3 @@
-from http.client import _DataType
 import requests
 import json
 import pprint
@@ -81,33 +80,6 @@ def diff_date(date_debut : datetime, date_fin : datetime) -> tuple[datetime, str
 
 # MAIN
 if __name__ == '__main__':
-
-    date_1 = datetime.now()
-
-    date_bebe_1 = datetime(2022, 1, 24, 13, 18, 3)
-    date_bebe_2 = datetime(2022, 1, 24, 17, 28, 39)
-    date_bebe_3 = datetime(2022, 1, 24, 23, 55, 30)
-
-    difference = date_bebe_1-date_1
-
-    en_minutes = round(difference.total_seconds() / 60, 2)
-    en_heures = round(en_minutes / 60, 2)
-    en_jours = round(en_heures / 24, 2)
-
-    string_result = "{} jours => {} heures => {} minutes".format(en_jours,en_heures,en_minutes)
-
-    print("date 1 : ",date_1)
-    print("date 2 : ",date_bebe_1)
-
-    print("diff : ", difference)
-    print("en_minutes : ", en_minutes)
-    print("en_heures : ", en_heures)
-    print("en_jours : ", en_jours)
-
-    print("resul ", string_result)
-    
-
-    exit(1)
     
     # Partie réseau - requete API
     client = Tron()
@@ -127,6 +99,23 @@ if __name__ == '__main__':
 
     print("adresse_cukies_base58 ! ", adresse_cukies_base58)
     print("adresse_tronlink_base58 : ", adresse_tronlink_base58)
+
+    # https://api.trongrid.io/wallet/triggerconstantcontract
+
+    """
+    
+    A tester : 
+
+    {
+        "contract_address": "41d8f6798aff04da7fcdab930291cd1f7bb0696fdf",
+        "owner_address": "41d47d8bd0d26d2f0710581103c01cda66e6c1730c",
+        "function_selector": "totalSupply()",
+        "parameter": ""
+    }
+
+    """
+
+    exit(1)
 
     # ZONE DE TEST
     # print("Debut")
