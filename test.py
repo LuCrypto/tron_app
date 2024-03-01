@@ -67,7 +67,7 @@ def random_api_key(parametre):
 
 # Renvoie un tuple contenant la difference de temps en
 # datetime ainsi que chaine de caractere recap
-def diff_date(date_debut : datetime, date_fin : datetime) -> tuple[datetime, str]:
+def diff_date(date_debut : datetime, date_fin : datetime) -> 'tuple[datetime, str]':
     difference = date_fin-date_debut
 
     en_minutes = round(difference.total_seconds() / 60, 2)

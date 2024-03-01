@@ -13,7 +13,7 @@ adresse_tronlink_victor = "TQ3ATvXV91QUWk4zimTNQxQkgKmSv3AUT7"
 def myTron():
     return client
 
-def myAdress() -> tuple[str, str]:
+def myAdress() -> 'tuple[str, str]':
     return (mon_adresse_tronlink, adresse_tronlink_victor, adresse_cukies)
 
 """
@@ -26,7 +26,7 @@ in that case, the console window that normally appears is suppressed.
 
 """
 # Renvoie l'energie du compte
-def getEnergy(ressource : dict) -> tuple[str, float, float, float]:
+def getEnergy(ressource : dict) -> 'tuple[str, float, float, float]':
 
     # print("=======\n")
     # pprint.pprint(ressource)
@@ -77,7 +77,7 @@ lien : https://developers.tron.network/reference/getaccountresource
 
 """
 # Renvoie la bandwidth du compte
-def getBandwitdh(ressource : dict) -> tuple[str, float, float, float]:
+def getBandwitdh(ressource : dict) -> 'tuple[str, float, float, float]':
     total_limit_bandwidth = ressource['freeNetLimit']+ressource['NetLimit']
 
     try:
@@ -100,7 +100,7 @@ def getBandwitdh(ressource : dict) -> tuple[str, float, float, float]:
     return (my_string,montant_bandwidth,total_limit_bandwidth,pourcentage_bandwidth)
 
 # Renvoie le nombre de tronpower
-def getTronpower(ressource : dict) -> tuple[str,int,int]:
+def getTronpower(ressource : dict) -> 'tuple[str, int, int]':
     try:
         tron_power_used = ressource['tronPowerUsed']
     except:
@@ -111,7 +111,7 @@ def getTronpower(ressource : dict) -> tuple[str,int,int]:
     except:
         tronPowerLimit = 0
     
-    return (f"{tron_power_used}/{tronPowerLimit} Tronpower\n\nNon utilisé : {tronPowerLimit-tron_power_used}",tron_power_used, tronPowerLimit)
+    return (f"{tron_power_used}/{tronPowerLimit} Tronpower\n\nNon utilisé : {tronPowerLimit-tron_power_used}", tron_power_used, tronPowerLimit)
 
 # Requete pour donner tronlink
 def actualiser_donnees_tronlink(adresse_tronlink):
